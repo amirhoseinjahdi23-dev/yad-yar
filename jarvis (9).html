@@ -1,0 +1,1711 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>دفتر برنامه‌ریزی هوشمند و امن JARVIS</title>
+        <!-- Tailwind CSS -->
+        <script src="https://cdn.tailwindcss.com"></script>
+        <!-- FontAwesome Icons -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <!-- Vazirmatn Font -->
+        <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <style>
+            body {
+                font-family: 'Vazirmatn', sans-serif;
+                background-color: #FDFBF7;
+                color: #292524;
+                transition: background-color 0.3s ease, color 0.3s ease;
+            }
+            :root {
+                --bg-main: #FDFBF7;
+                --bg-card: #FFFFFF;
+                --border-color: #E7E5E4;
+                --text-main: #292524;
+                --text-muted: #78716C;
+                --accent-color: #2563EB;
+                --accent-hover: #1D4ED8;
+                --nav-hover: #EFF6FF;
+                --nav-active-bg: #EFF6FF;
+                --nav-active-text: #1D4ED8;
+                --nav-active-border: #BFDBFE;
+            }
+            body.dark-mode {
+                --bg-main: #0B0F19;
+                --bg-card: #131B2E;
+                --border-color: #1E293B;
+                --text-main: #F8FAFC;
+                --text-muted: #94A3B8;
+                --accent-color: #38BDF8;
+            }
+            select {
+                appearance: none;
+                background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+                background-repeat: no-repeat;
+                background-position: left 1rem center;
+                background-size: 1em;
+                padding-left: 2.5rem !important;
+                border-radius: 1rem !important;
+            }
+            input, select, textarea {
+                border-radius: 1rem !important;
+            }
+            .dynamic-card {
+                background-color: var(--bg-card) !important;
+                border-color: var(--border-color) !important;
+                color: var(--text-main) !important;
+            }
+            .nav-item-btn {
+                background-color: transparent;
+                color: var(--text-main);
+                border: 1px solid transparent;
+                transition: all 0.2s ease;
+            }
+            .nav-item-btn:hover {
+                background-color: var(--nav-hover) !important;
+                color: var(--accent-color) !important;
+            }
+            .nav-item-btn.active-nav {
+                background-color: var(--nav-active-bg) !important;
+                color: var(--nav-active-text) !important;
+                border-color: var(--nav-active-border) !important;
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            }
+            ::-webkit-scrollbar {
+                width: 6px;
+                height: 6px;
+            }
+            ::-webkit-scrollbar-track {
+                background: var(--bg-card);
+            }
+            ::-webkit-scrollbar-thumb {
+                background: var(--border-color);
+                border-radius: 9999px;
+            }
+            .tab-content {
+                display: none;
+            }
+            .tab-content.active {
+                display: block;
+                animation: fadeIn 0.3s ease-in-out;
+            }
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(4px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            #sidebar-container {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                background-color: var(--bg-card) !important;
+                border-color: var(--border-color) !important;
+            }
+            aside.sidebar-collapsed {
+                width: 0 !important;
+                min-width: 0 !important;
+                padding: 0 !important;
+                overflow: hidden !important;
+                border-left: none !important;
+                opacity: 0;
+                pointer-events: none;
+            }
+        </style>
+    </head>
+    <body class="min-h-screen flex flex-col">
+
+        <!-- TOP BAR -->
+        <header class="border-b px-6 py-3.5 flex items-center justify-between sticky top-0 z-30 shadow-sm" style="background-color: var(--bg-card); border-color: var(--border-color);">
+            <div class="flex items-center gap-4">
+                <button onclick="toggleSidebar()" class="w-10 h-10 rounded-2xl flex items-center justify-center transition-all" style="background-color: var(--bg-main); border: 1px solid var(--border-color); color: var(--text-main);" title="منو">
+                    <i class="fa-solid fa-bars text-sm"></i>
+                </button>
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center text-white text-sm font-bold shadow">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <span class="font-bold text-sm tracking-wider" style="color: var(--text-main);">JARVIS <span class="text-[10px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-md">SECURE</span></span>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="toggleDarkMode()" class="w-10 h-10 rounded-2xl flex items-center justify-center transition-all" style="background-color: var(--bg-main); border: 1px solid var(--border-color); color: var(--text-main);" title="تغییر حالت روز و شب">
+                    <i id="theme-mode-icon" class="fa-solid fa-moon text-sm"></i>
+                </button>
+                <button onclick="openAuthModal()" class="text-xs px-3.5 py-2 rounded-2xl transition-all flex items-center gap-2" style="background-color: var(--bg-main); border: 1px solid var(--border-color); color: var(--text-main);">
+                    <i class="fa-solid fa-shield-check text-emerald-600"></i>
+                    <span id="user-email-display-top" class="max-w-[120px] truncate">حساب امن</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- MAIN APP WRAPPER -->
+        <div class="flex flex-1 relative overflow-hidden">
+            <!-- Sidebar Menu -->
+            <aside id="sidebar-container" class="w-72 border-l p-6 flex flex-col justify-between shrink-0 shadow-sm z-20 h-[calc(100vh-65px)] sticky top-[65px] overflow-y-auto">
+                <div>
+                    <div class="flex items-center justify-between mb-6 pb-4 border-b" style="border-color: var(--border-color); color: var(--text-main);">
+                        <div>
+                            <h1 class="font-bold text-sm tracking-wide">منوی امن JARVIS</h1>
+                            <p class="text-[11px] opacity-70">رمزنگاری سرتاسری ابری</p>
+                        </div>
+                        <button onclick="toggleSidebar()" class="md:hidden opacity-70 hover:opacity-100 p-2">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+
+                    <!-- Navigation Links -->
+                    <nav class="space-y-1.5">
+                        <button onclick="switchTab('home')" id="btn-home" class="nav-item-btn active-nav w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium">
+                            <span class="w-6 text-center text-blue-600"><i class="fa-solid fa-house text-base"></i></span>
+                            <span>خانه (داشبورد امن)</span>
+                        </button>
+                        <button onclick="switchTab('daily')" id="btn-daily" class="nav-item-btn w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium">
+                            <span class="w-6 text-center text-indigo-600"><i class="fa-solid fa-calendar-day text-base"></i></span>
+                            <span>برنامه روزانه</span>
+                        </button>
+                        <button onclick="switchTab('weekly')" id="btn-weekly" class="nav-item-btn w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium">
+                            <span class="w-6 text-center text-sky-600"><i class="fa-solid fa-calendar-week text-base"></i></span>
+                            <span>دیدگاه هفتگی</span>
+                        </button>
+                        <button onclick="switchTab('monthly')" id="btn-monthly" class="nav-item-btn w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium">
+                            <span class="w-6 text-center text-cyan-600"><i class="fa-solid fa-calendar text-base"></i></span>
+                            <span>دیدگاه ماهانه</span>
+                        </button>
+                        <button onclick="switchTab('annual')" id="btn-annual" class="nav-item-btn w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium">
+                            <span class="w-6 text-center text-rose-500"><i class="fa-solid fa-calendar-days text-base"></i></span>
+                            <span>تقویم سالانه ۱۴۰۵</span>
+                        </button>
+                        <button onclick="switchTab('instagram')" id="btn-instagram" class="nav-item-btn w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium">
+                            <span class="w-6 text-center text-pink-600"><i class="fa-brands fa-instagram text-base"></i></span>
+                            <span>استودیوی اینستاگرام</span>
+                        </button>
+                        <button onclick="switchTab('youtube')" id="btn-youtube" class="nav-item-btn w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium">
+                            <span class="w-6 text-center text-red-600"><i class="fa-brands fa-youtube text-base"></i></span>
+                            <span>استودیوی یوتیوب</span>
+                        </button>
+                        <button onclick="switchTab('languages')" id="btn-languages" class="nav-item-btn w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium">
+                            <span class="w-6 text-center text-blue-500"><i class="fa-solid fa-language text-base"></i></span>
+                            <span>یادگیری زبان (EN/TR)</span>
+                        </button>
+                        <button onclick="switchTab('books')" id="btn-books" class="nav-item-btn w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium">
+                            <span class="w-6 text-center text-amber-600"><i class="fa-solid fa-book text-base"></i></span>
+                            <span>کتابخانه و مطالعه</span>
+                        </button>
+                        <button onclick="switchTab('finance')" id="btn-finance" class="nav-item-btn w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium">
+                            <span class="w-6 text-center text-emerald-600"><i class="fa-solid fa-wallet text-base"></i></span>
+                            <span>مدیریت مالی و طلا/نقره/مس</span>
+                        </button>
+                        <button onclick="switchTab('habits')" id="btn-habits" class="nav-item-btn w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium">
+                            <span class="w-6 text-center text-teal-600"><i class="fa-solid fa-bullseye text-base"></i></span>
+                            <span>ردیاب عادات و خواب</span>
+                        </button>
+                        <button onclick="switchTab('vision')" id="btn-vision" class="nav-item-btn w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium">
+                            <span class="w-6 text-center text-amber-500"><i class="fa-solid fa-star text-base"></i></span>
+                            <span>جعبه اهداف (Vision Board)</span>
+                        </button>
+                        <button onclick="switchTab('business')" id="btn-business" class="nav-item-btn w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium">
+                            <span class="w-6 text-center text-emerald-600"><i class="fa-solid fa-lightbulb text-base"></i></span>
+                            <span>ایده‌ها و استارتاپ‌ها</span>
+                        </button>
+                        <button onclick="switchTab('diet')" id="btn-diet" class="nav-item-btn w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium">
+                            <span class="w-6 text-center text-orange-500"><i class="fa-solid fa-utensils text-base"></i></span>
+                            <span>رژیم و کالری‌شمار</span>
+                        </button>
+                        <button onclick="switchTab('pomodoro')" id="btn-pomodoro" class="nav-item-btn w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium">
+                            <span class="w-6 text-center text-rose-500"><i class="fa-solid fa-stopwatch text-base"></i></span>
+                            <span>تایمر پومودورو</span>
+                        </button>
+                        <button onclick="switchTab('users')" id="btn-users" class="nav-item-btn w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium hidden">
+                            <span class="w-6 text-center text-amber-600"><i class="fa-solid fa-user-shield text-base"></i></span>
+                            <span>مدیریت کاربران (مالک)</span>
+                        </button>
+                        <button onclick="switchTab('notes')" id="btn-notes" class="nav-item-btn w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-medium">
+                            <span class="w-6 text-center text-violet-600"><i class="fa-solid fa-note-sticky text-base"></i></span>
+                            <span>یادداشت‌های آزاد</span>
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- Sidebar Footer -->
+                <div class="mt-8 pt-6 border-t" style="border-color: var(--border-color);">
+                    <div class="p-4 rounded-2xl border shadow-sm" style="background-color: var(--bg-main); border-color: var(--border-color); color: var(--text-main);">
+                        <p class="text-xs font-medium leading-relaxed mb-2">«امنیت فوق‌العاده پیشرفته با رمزنگاری داده‌ها فعال است 🔒»</p>
+                        <div class="flex flex-col gap-1 text-[11px] opacity-75">
+                            <span class="font-semibold">امروز: ۱۱ آبان ۱۴۰۵</span>
+                            <span class="text-blue-500">قمری: ۲۱ جمادی‌الاول ۱۴۴۸</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="flex-1 overflow-y-auto p-6 md:p-10 transition-all">
+                <div class="max-w-6xl mx-auto space-y-6">
+
+                    <!-- HOME TAB -->
+                    <div id="tab-home" class="tab-content active space-y-6">
+                        <div class="relative overflow-hidden p-8 md:p-10 rounded-3xl shadow-xl text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 flex flex-col md:flex-row items-center justify-between gap-6">
+                            <div class="absolute -left-10 -bottom-10 w-48 h-48 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+                            <div class="relative z-10 space-y-3">
+                                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-medium">
+                                    <i class="fa-solid fa-sparkles text-amber-300"></i>
+                                    <span>سیستم هوشمند مدیریت و برنامه‌ریزی</span>
+                                </div>
+                                <h2 class="text-3xl font-extrabold tracking-tight">سلام، خوش آمدید 👋</h2>
+                                <p class="text-sm opacity-90 leading-relaxed max-w-xl">دستیار هوشمند و امن JARVIS آماده است تا برنامه‌های روزانه، اهداف، مالی و مطالعاتی شما را با بالاترین دقت مدیریت کند.</p>
+                            </div>
+                            <div class="relative z-10 flex items-center gap-3">
+                                <button onclick="switchTab('daily')" class="px-6 py-3.5 rounded-2xl bg-white text-blue-700 hover:bg-blue-50 font-bold text-sm transition shadow-lg flex items-center gap-2">
+                                    <i class="fa-solid fa-rocket"></i><span>شروع برنامه امروز</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                            <div class="dynamic-card p-6 rounded-3xl border shadow-sm transition-all hover:shadow-md hover:-translate-y-1 relative overflow-hidden group">
+                                <div class="absolute top-0 right-0 w-2 h-full bg-blue-500"></div>
+                                <div class="flex items-center justify-between mb-4">
+                                    <span class="text-xs font-bold opacity-70">کارهای امروز</span>
+                                    <div class="w-10 h-10 rounded-2xl bg-blue-500/10 text-blue-600 flex items-center justify-center font-bold">
+                                        <i class="fa-solid fa-list-check text-base"></i>
+                                    </div>
+                                </div>
+                                <div class="text-2xl font-black" id="stat-tasks-count">۰ از ۰</div>
+                                <p class="text-[11px] opacity-60 mt-1">تسک‌های تکمیل شده امروز</p>
+                            </div>
+
+                            <div class="dynamic-card p-6 rounded-3xl border shadow-sm transition-all hover:shadow-md hover:-translate-y-1 relative overflow-hidden group">
+                                <div class="absolute top-0 right-0 w-2 h-full bg-amber-500"></div>
+                                <div class="flex items-center justify-between mb-4">
+                                    <span class="text-xs font-bold opacity-70">ساعت مطالعه</span>
+                                    <div class="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-600 flex items-center justify-center font-bold">
+                                        <i class="fa-solid fa-book-open text-base"></i>
+                                    </div>
+                                </div>
+                                <div class="text-2xl font-black" id="stat-study-hours">۰ ساعت</div>
+                                <p class="text-[11px] opacity-60 mt-1">زمان تمرکز و یادگیری</p>
+                            </div>
+
+                            <div class="dynamic-card p-6 rounded-3xl border shadow-sm transition-all hover:shadow-md hover:-translate-y-1 relative overflow-hidden group">
+                                <div class="absolute top-0 right-0 w-2 h-full bg-emerald-500"></div>
+                                <div class="flex items-center justify-between mb-4">
+                                    <span class="text-xs font-bold opacity-70">پس‌انداز طلا/نقره/مس</span>
+                                    <div class="w-10 h-10 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center font-bold">
+                                        <i class="fa-solid fa-coins text-base"></i>
+                                    </div>
+                                </div>
+                                <div class="text-2xl font-black" id="stat-gold-sum">۰ تومان</div>
+                                <p class="text-[11px] opacity-60 mt-1">ارزش روز دارایی‌ها</p>
+                            </div>
+
+                            <div class="dynamic-card p-6 rounded-3xl border shadow-sm transition-all hover:shadow-md hover:-translate-y-1 relative overflow-hidden group">
+                                <div class="absolute top-0 right-0 w-2 h-full bg-indigo-500"></div>
+                                <div class="flex items-center justify-between mb-4">
+                                    <span class="text-xs font-bold opacity-70">وضعیت سیستم</span>
+                                    <div class="w-10 h-10 rounded-2xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center font-bold">
+                                        <i class="fa-solid fa-shield-halved text-base"></i>
+                                    </div>
+                                </div>
+                                <div class="text-sm font-bold text-emerald-600 mt-2">رمزنگاری شده و امن</div>
+                                <p class="text-[11px] opacity-60 mt-1">فضای ابری اختصاصی</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DAILY TAB -->
+                    <div id="tab-daily" class="tab-content space-y-6">
+                        <div class="dynamic-card p-6 md:p-8 rounded-3xl border shadow-sm space-y-6">
+                            <div class="flex flex-col md:flex-row items-center justify-between gap-4 border-b pb-6" style="border-color: var(--border-color);">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-600 flex items-center justify-center text-xl font-bold">
+                                        <i class="fa-solid fa-calendar-day"></i>
+                                    </div>
+                                    <div>
+                                        <h2 class="text-xl font-extrabold">برنامه روزانه</h2>
+                                        <p class="text-xs opacity-70">کارهای امروز را تیک بزنید و روزی دلپذیر بسازید.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3 w-full md:w-auto justify-end">
+                                    <button onclick="resetDailyTasks()" class="px-4 py-2.5 rounded-2xl border text-xs font-medium flex items-center gap-2 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                                        <i class="fa-solid fa-rotate-right text-amber-500"></i>
+                                        <span>بازنشانی</span>
+                                    </button>
+                                    <div class="flex items-center gap-2 px-4 py-2.5 rounded-2xl border text-xs font-medium" style="background-color: var(--bg-main);">
+                                        <i class="fa-solid fa-calendar-days text-blue-500"></i>
+                                        <input type="text" id="daily-shamsi-picker" value="شنبه ۱۱ آبان ۱۴۰۵" class="bg-transparent border-none text-xs outline-none w-36 text-center font-bold">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                <div class="space-y-6">
+                                    <div class="p-5 rounded-2xl border space-y-3" style="background-color: var(--bg-main);">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-xs font-bold flex items-center gap-2">
+                                                <i class="fa-solid fa-star text-amber-500"></i>
+                                                <span>اولویت‌های کلیدی</span>
+                                            </span>
+                                        </div>
+                                        <div class="space-y-2">
+                                            <div class="flex items-center gap-2 bg-blue-50/80 dark:bg-slate-900 p-2.5 rounded-xl border border-blue-200 dark:border-slate-800">
+                                                <span class="w-6 h-6 rounded-lg bg-amber-500/10 text-amber-600 text-xs font-bold flex items-center justify-center">۱</span>
+                                                <input type="text" value="انجام پروژه اصلی" class="bg-transparent text-xs w-full outline-none text-slate-800 dark:text-slate-100 font-medium">
+                                            </div>
+                                            <div class="flex items-center gap-2 bg-blue-50/80 dark:bg-slate-900 p-2.5 rounded-xl border border-blue-200 dark:border-slate-800">
+                                                <span class="w-6 h-6 rounded-lg bg-amber-500/10 text-amber-600 text-xs font-bold flex items-center justify-center">۲</span>
+                                                <input type="text" value="ورزش یا حرکت کششی" class="bg-transparent text-xs w-full outline-none text-slate-800 dark:text-slate-100 font-medium">
+                                            </div>
+                                            <div class="flex items-center gap-2 bg-blue-50/80 dark:bg-slate-900 p-2.5 rounded-xl border border-blue-200 dark:border-slate-800">
+                                                <span class="w-6 h-6 rounded-lg bg-amber-500/10 text-amber-600 text-xs font-bold flex items-center justify-center">۳</span>
+                                                <input type="text" value="تماس با یک دوست عزیز" class="bg-transparent text-xs w-full outline-none text-slate-800 dark:text-slate-100 font-medium">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="p-5 rounded-2xl border space-y-4" style="background-color: var(--bg-main);">
+                                        <div class="flex items-center gap-2 text-xs font-bold">
+                                            <i class="fa-solid fa-bolt text-amber-500"></i>
+                                            <span>تمرکز و انرژی امروز</span>
+                                        </div>
+                                        <div class="space-y-2">
+                                            <label class="text-[11px] opacity-70">کلمه کلیدی یا شعار امروز:</label>
+                                            <input type="text" value="امروز آرامش را انتخاب می‌کنم." class="w-full px-3 py-2.5 rounded-xl border text-xs bg-blue-50/80 dark:bg-slate-900 outline-none border-blue-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 font-medium">
+                                        </div>
+                                        <div class="space-y-2">
+                                            <label class="text-[11px] opacity-70">میزان رضایت از انرژی (۱ تا ۱۰):</label>
+                                            <input type="range" min="1" max="10" value="8" class="w-full accent-amber-500">
+                                            <div class="flex justify-between text-[10px] opacity-60">
+                                                <span>کم</span>
+                                                <span>عالی</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="lg:col-span-2 space-y-6">
+                                    <div class="p-5 rounded-2xl border space-y-4" style="background-color: var(--bg-main);">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center gap-2 text-xs font-bold">
+                                                <i class="fa-solid fa-list-check text-blue-500"></i>
+                                                <span>کارهای امروز</span>
+                                            </div>
+                                            <span id="daily-progress-badge" class="px-3 py-1 rounded-full text-[11px] font-bold bg-blue-500/10 text-blue-600">۰ از ۵ انجام شده</span>
+                                        </div>
+
+                                        <div class="flex gap-2">
+                                            <button onclick="addDailyTask()" class="w-11 h-11 rounded-2xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow hover:bg-amber-600 transition">
+                                                <i class="fa-solid fa-plus text-sm"></i>
+                                            </button>
+                                            <input type="text" id="new-task-input" placeholder="افزودن کار جدید... (مثال: ۲۰ دقیقه مدیتیشن)" class="flex-1 px-4 py-3 rounded-2xl border text-xs bg-white dark:bg-slate-900 outline-none" style="border-color: var(--border-color);">
+                                        </div>
+
+                                        <div id="daily-tasks-list" class="space-y-2.5"></div>
+                                    </div>
+
+                                    <div class="p-5 rounded-2xl border space-y-3" style="background-color: var(--bg-main);">
+                                        <div class="flex items-center gap-2 text-xs font-bold">
+                                            <i class="fa-solid fa-feather text-amber-600"></i>
+                                            <span>یادداشت روزانه و شکرگزاری</span>
+                                        </div>
+                                        <textarea id="daily-gratitude-text" rows="3" placeholder="امروز برای چه چیزی سپاسگزار هستید؟" class="w-full p-3 rounded-xl border text-xs bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none resize-none font-medium" style="border-color: var(--border-color);">امروز بابت سلامتی، آرامش و فرصت دوباره برای پیشرفت سپاسگزارم.</textarea>
+                                    </div>
+
+                                    <div class="p-5 rounded-2xl border space-y-3" style="background-color: var(--bg-main);">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center gap-2 text-xs font-bold">
+                                                <i class="fa-solid fa-clock-rotate-left text-indigo-500"></i>
+                                                <span>آرشیو روزهای گذشته (تاریخ‌دار)</span>
+                                            </div>
+                                            <button onclick="saveCurrentDayToArchive()" class="px-3 py-1.5 rounded-xl bg-blue-600 text-white text-[11px] font-bold shadow hover:bg-blue-700 transition">
+                                                ثبت و ذخیره این روز در آرشیو
+                                            </button>
+                                        </div>
+                                        <div id="daily-archive-list" class="space-y-2 max-h-48 overflow-y-auto"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- WEEKLY TAB -->
+                    <div id="tab-weekly" class="tab-content space-y-6">
+                        <div class="dynamic-card p-6 md:p-8 rounded-3xl border shadow-sm space-y-6">
+                            <div class="flex flex-col md:flex-row items-center justify-between gap-4 border-b pb-6" style="border-color: var(--border-color);">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 rounded-2xl bg-sky-500/10 text-sky-600 flex items-center justify-center text-xl font-bold">
+                                        <i class="fa-solid fa-calendar-week"></i>
+                                    </div>
+                                    <div>
+                                        <h2 class="text-xl font-extrabold" id="weekly-title-display">دیدگاه هفتگی (هفته جاری)</h2>
+                                        <p class="text-xs opacity-70">نمای کلی برنامه‌ها و اهداف این هفته (شنبه تا جمعه) متناسب با تقویم ۱۴۰۵.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <button onclick="changeWeek(-1)" class="px-4 py-2.5 rounded-2xl border text-xs font-medium flex items-center gap-1.5 hover:bg-sky-50 transition" style="background-color: var(--bg-main);">
+                                        <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                                        <span>هفته قبل</span>
+                                    </button>
+                                    <button onclick="currentWeekNow()" class="px-4 py-2.5 rounded-2xl bg-sky-600 text-white text-xs font-bold shadow hover:bg-sky-700 transition">
+                                        هفته جاری
+                                    </button>
+                                    <button onclick="changeWeek(1)" class="px-4 py-2.5 rounded-2xl border text-xs font-medium flex items-center gap-1.5 hover:bg-sky-50 transition" style="background-color: var(--bg-main);">
+                                        <span>هفته بعد</span>
+                                        <i class="fa-solid fa-chevron-left text-[10px]"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6" id="weekly-days-grid"></div>
+                        </div>
+                    </div>
+
+                    <!-- MONTHLY TAB -->
+                    <div id="tab-monthly" class="tab-content space-y-6">
+                        <div class="dynamic-card p-6 md:p-8 rounded-3xl border shadow-sm space-y-6">
+                            <div class="flex flex-col md:flex-row items-center justify-between gap-4 border-b pb-6" style="border-color: var(--border-color);">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 text-cyan-600 flex items-center justify-center text-xl font-bold">
+                                        <i class="fa-solid fa-calendar"></i>
+                                    </div>
+                                    <div>
+                                        <h2 class="text-xl font-extrabold">دیدگاه ماهانه</h2>
+                                        <p class="text-xs opacity-70">نگاهی کلان به رویدادها، اهداف و یادداشت‌های ماه.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="px-4 py-2 rounded-2xl border text-xs font-bold" style="background-color: var(--bg-main); border-color: var(--border-color);">۱۴۰۵</span>
+                                    <select id="monthly-selector" onchange="renderMonthlyView()" class="px-5 py-2.5 rounded-2xl border text-xs font-bold outline-none cursor-pointer" style="background-color: var(--bg-main); border-color: var(--border-color);">
+                                        <option value="فروردین">فروردین</option>
+                                        <option value="اردیبهشت">اردیبهشت</option>
+                                        <option value="خرداد">خرداد</option>
+                                        <option value="تیر">تیر</option>
+                                        <option value="مرداد">مرداد</option>
+                                        <option value="شهریور">شهریور</option>
+                                        <option value="مهر">مهر</option>
+                                        <option value="آبان" selected>آبان</option>
+                                        <option value="آذر">آذر</option>
+                                        <option value="دی">دی</option>
+                                        <option value="بهمن">بهمن</option>
+                                        <option value="اسفند">اسفند</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                <div class="lg:col-span-2 p-6 rounded-3xl border space-y-6" style="background-color: var(--bg-main); border-color: var(--border-color);">
+                                    <div class="flex items-center justify-between border-b pb-4" style="border-color: var(--border-color);">
+                                        <div class="flex items-center gap-2 text-sm font-extrabold text-cyan-600">
+                                            <i class="fa-solid fa-calendar-days"></i>
+                                            <span>تقویم ماهانه</span>
+                                        </div>
+                                        <span id="monthly-days-count-badge" class="text-xs opacity-70 font-bold">۳۰ روز</span>
+                                    </div>
+
+                                    <div class="grid grid-cols-7 gap-2 text-center text-xs font-bold opacity-70 pb-2">
+                                        <span>ش</span>
+                                        <span>ی</span>
+                                        <span>د</span>
+                                        <span>س</span>
+                                        <span>چ</span>
+                                        <span>پ</span>
+                                        <span class="text-rose-500">ج</span>
+                                    </div>
+
+                                    <div id="monthly-calendar-grid" class="grid grid-cols-7 gap-2.5"></div>
+                                </div>
+
+                                <div class="p-6 rounded-3xl border space-y-5" style="background-color: var(--bg-main); border-color: var(--border-color);">
+                                    <div class="flex items-center gap-2 text-sm font-extrabold text-amber-500">
+                                        <i class="fa-solid fa-bullseye"></i>
+                                        <span>اهداف کلیدی این ماه</span>
+                                    </div>
+
+                                    <div class="flex gap-2">
+                                        <button onclick="addMonthlyGoal()" class="px-5 py-3 rounded-2xl bg-amber-600 text-white font-bold text-xs shadow hover:bg-amber-700 transition shrink-0">
+                                            افزودن
+                                        </button>
+                                        <input type="text" id="new-monthly-goal-input" placeholder="هدف ماهانه..." class="flex-1 px-4 py-3 rounded-2xl border text-xs bg-white dark:bg-slate-900 outline-none text-slate-900 dark:text-white font-medium" style="border-color: var(--border-color);">
+                                    </div>
+
+                                    <div id="monthly-goals-list" class="space-y-3"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ANNUAL TAB (1405) -->
+                    <div id="tab-annual" class="tab-content space-y-6">
+                        <div class="dynamic-card p-6 rounded-3xl border shadow-sm">
+                            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+                                <div>
+                                    <h2 class="text-xl font-bold">تقویم سالانه ۱۴۰۵</h2>
+                                    <p class="text-xs opacity-70">تقویم کامل سال ۱۴۰۵ با مناسبت‌ها و تعطیلات رسمی ایران.</p>
+                                </div>
+                            </div>
+                            <div id="annual-calendar-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                        </div>
+                    </div>
+
+                    <!-- INSTAGRAM STUDIO -->
+                    <div id="tab-instagram" class="tab-content space-y-6">
+                        <div class="dynamic-card p-6 rounded-3xl border shadow-sm space-y-4">
+                            <h2 class="text-xl font-bold">استودیوی اینستاگرام</h2>
+                            <p class="text-xs opacity-70">مدیریت محتوا، ایده‌های پست و استوری.</p>
+                            <div class="flex gap-2">
+                                <input type="text" id="new-insta-input" placeholder="عنوان ایده پست یا ریلز..." class="flex-1 px-4 py-3 rounded-2xl border text-sm bg-transparent">
+                                <button onclick="addInstaItem()" class="px-6 py-3 rounded-2xl bg-pink-600 text-white font-medium text-sm">افزودن ایده</button>
+                            </div>
+                            <div id="instagram-list" class="space-y-2"></div>
+                        </div>
+                    </div>
+
+                    <!-- YOUTUBE STUDIO -->
+                    <div id="tab-youtube" class="tab-content space-y-6">
+                        <div class="dynamic-card p-6 md:p-8 rounded-3xl border shadow-sm space-y-6">
+                            <div class="flex flex-col md:flex-row items-center justify-between gap-4 p-6 rounded-3xl border shadow-sm" style="background-color: var(--bg-main); border-color: var(--border-color);">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 rounded-2xl bg-red-600 text-white flex items-center justify-center text-xl font-bold shadow">
+                                        <i class="fa-brands fa-youtube"></i>
+                                    </div>
+                                    <div>
+                                        <h2 class="text-xl font-extrabold">استودیوی حرفه‌ای یوتیوب</h2>
+                                        <p class="text-xs opacity-70">مدیریت ایده‌ها، اسکریپت، سئو، تقویم انتشار و چک‌لیست تولید محتوا.</p>
+                                    </div>
+                                </div>
+                                <button onclick="openNewYtModal()" class="px-6 py-3 rounded-2xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-lg transition flex items-center gap-2">
+                                    <i class="fa-solid fa-plus text-sm"></i>
+                                    <span>ایده یا ویدیوی جدید</span>
+                                </button>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div class="p-6 rounded-3xl border shadow-sm flex items-center justify-between" style="background-color: var(--bg-main); border-color: var(--border-color);">
+                                    <div>
+                                        <span class="text-xs opacity-70 font-bold">ویدیوهای منتشر شده</span>
+                                        <div class="text-2xl font-black mt-2 text-emerald-600" id="yt-stat-published">۱</div>
+                                    </div>
+                                    <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center text-lg font-bold">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                    </div>
+                                </div>
+                                <div class="p-6 rounded-3xl border shadow-sm flex items-center justify-between" style="background-color: var(--bg-main); border-color: var(--border-color);">
+                                    <div>
+                                        <span class="text-xs opacity-70 font-bold">در حال تولید / تدوین</span>
+                                        <div class="text-2xl font-black mt-2 text-amber-600" id="yt-stat-producing">۱</div>
+                                    </div>
+                                    <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-600 flex items-center justify-center text-lg font-bold">
+                                        <i class="fa-solid fa-clapperboard"></i>
+                                    </div>
+                                </div>
+                                <div class="p-6 rounded-3xl border shadow-sm flex items-center justify-between" style="background-color: var(--bg-main); border-color: var(--border-color);">
+                                    <div>
+                                        <span class="text-xs opacity-70 font-bold">کل ایده‌های ثبت‌شده</span>
+                                        <div class="text-2xl font-black mt-2 text-red-600" id="yt-stat-total">۲</div>
+                                    </div>
+                                    <div class="w-12 h-12 rounded-2xl bg-red-500/10 text-red-600 flex items-center justify-center text-lg font-bold">
+                                        <i class="fa-solid fa-lightbulb"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                <div class="lg:col-span-2 p-6 md:p-8 rounded-3xl border shadow-sm flex flex-col justify-between min-h-[420px]" style="background-color: var(--bg-main); border-color: var(--border-color);" id="yt-details-container">
+                                    <div id="yt-selected-view" class="space-y-6 text-center py-12">
+                                        <div class="w-20 h-20 rounded-3xl bg-red-500/10 text-red-600 flex items-center justify-center text-3xl mx-auto shadow-inner">
+                                            <i class="fa-brands fa-youtube"></i>
+                                        </div>
+                                        <div class="space-y-2">
+                                            <h3 class="text-lg font-bold">ویدیویی انتخاب نشده است</h3>
+                                            <p class="text-xs opacity-70 max-w-sm mx-auto leading-relaxed">از لیست سمت راست یک ویدیو انتخاب کنید یا روی دکمه «افزودن ایده جدید» کلیک کنید تا بخش‌های سئو، تگ و یادداشت‌ها ظاهر شود.</p>
+                                        </div>
+                                        <button onclick="openNewYtModal()" class="px-6 py-3 rounded-2xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow transition inline-flex items-center gap-2">
+                                            <i class="fa-solid fa-plus"></i>
+                                            <span>افزودن ایده جدید</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="p-6 rounded-3xl border shadow-sm space-y-4 flex flex-col h-full" style="background-color: var(--bg-main); border-color: var(--border-color);">
+                                    <div class="flex items-center justify-between border-b pb-3" style="border-color: var(--border-color);">
+                                        <div class="flex items-center gap-2 text-xs font-extrabold text-red-600">
+                                            <i class="fa-solid fa-list-ul"></i>
+                                            <span>لیست ویدیوها و ایده‌ها</span>
+                                        </div>
+                                        <span id="yt-list-count-badge" class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-red-500/10 text-red-600">۲ مورد</span>
+                                    </div>
+                                    <div id="youtube-list" class="space-y-3 overflow-y-auto max-h-[380px]"></div>
+                                </div>
+                            </div>
+
+                            <!-- YOUTUBE MONTHLY PUBLISH CALENDAR -->
+                            <div class="p-6 md:p-8 rounded-3xl border shadow-sm space-y-4" style="background-color: var(--bg-main); border-color: var(--border-color);">
+                                <div class="flex items-center justify-between border-b pb-4" style="border-color: var(--border-color);">
+                                    <div class="flex items-center gap-2 text-sm font-extrabold text-red-600">
+                                        <i class="fa-solid fa-calendar-days"></i>
+                                        <span>تقویم انتشار ماهانه ویدیوها (آبان ۱۴۰۵)</span>
+                                    </div>
+                                    <span class="text-xs opacity-70 font-bold">مشخص کردن روز انتشار</span>
+                                </div>
+                                <div class="grid grid-cols-7 gap-2 text-center text-xs font-bold opacity-70 pb-2">
+                                    <span>ش</span>
+                                    <span>ی</span>
+                                    <span>د</span>
+                                    <span>س</span>
+                                    <span>چ</span>
+                                    <span>پ</span>
+                                    <span class="text-rose-500">ج</span>
+                                </div>
+                                <div id="yt-publish-calendar-grid" class="grid grid-cols-7 gap-2.5"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- LANGUAGES TAB -->
+                    <div id="tab-languages" class="tab-content space-y-6">
+                        <div class="dynamic-card p-6 md:p-8 rounded-3xl border shadow-sm space-y-6">
+                            <div class="flex flex-col md:flex-row items-center justify-between gap-4 border-b pb-6" style="border-color: var(--border-color);">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-600 flex items-center justify-center text-xl font-bold">
+                                        <i class="fa-solid fa-language"></i>
+                                    </div>
+                                    <div>
+                                        <h2 class="text-xl font-extrabold">مجموعه تخصصی یادگیری زبان (انگلیسی و ترکی)</h2>
+                                        <p class="text-xs opacity-70">جعبه لایتنر ۵ مرحله‌ای، گرامر تخصصی و آزمون واژگان.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <button onclick="setLangLanguage('EN')" id="lang-tab-en" class="px-5 py-2.5 rounded-2xl text-xs font-bold transition bg-blue-600 text-white shadow">English</button>
+                                    <button onclick="setLangLanguage('TR')" id="lang-tab-tr" class="px-5 py-2.5 rounded-2xl text-xs font-bold transition bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300">Türkçe</button>
+                                </div>
+                            </div>
+
+                            <!-- Leitner Boxes Header -->
+                            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                                <div onclick="filterLeitnerBox(1)" class="p-4 rounded-2xl border text-center cursor-pointer transition hover:scale-105" style="background-color: var(--bg-main); border-color: var(--border-color);">
+                                    <span class="text-[10px] opacity-70 block">خانه ۱ (روزانه)</span>
+                                    <div class="text-lg font-black text-rose-500 mt-1" id="box-count-1">۰</div>
+                                </div>
+                                <div onclick="filterLeitnerBox(2)" class="p-4 rounded-2xl border text-center cursor-pointer transition hover:scale-105" style="background-color: var(--bg-main); border-color: var(--border-color);">
+                                    <span class="text-[10px] opacity-70 block">خانه ۲ (هر ۳ روز)</span>
+                                    <div class="text-lg font-black text-amber-500 mt-1" id="box-count-2">۰</div>
+                                </div>
+                                <div onclick="filterLeitnerBox(3)" class="p-4 rounded-2xl border text-center cursor-pointer transition hover:scale-105" style="background-color: var(--bg-main); border-color: var(--border-color);">
+                                    <span class="text-[10px] opacity-70 block">خانه ۳ (هر ۷ روز)</span>
+                                    <div class="text-lg font-black text-blue-500 mt-1" id="box-count-3">۰</div>
+                                </div>
+                                <div onclick="filterLeitnerBox(4)" class="p-4 rounded-2xl border text-center cursor-pointer transition hover:scale-105" style="background-color: var(--bg-main); border-color: var(--border-color);">
+                                    <span class="text-[10px] opacity-70 block">خانه ۴ (هر ۱۴ روز)</span>
+                                    <div class="text-lg font-black text-indigo-500 mt-1" id="box-count-4">۰</div>
+                                </div>
+                                <div onclick="filterLeitnerBox(5)" class="p-4 rounded-2xl border text-center cursor-pointer transition hover:scale-105" style="background-color: var(--bg-main); border-color: var(--border-color);">
+                                    <span class="text-[10px] opacity-70 block">خانه ۵ (مسلط شده)</span>
+                                    <div class="text-lg font-black text-emerald-500 mt-1" id="box-count-5">۰</div>
+                                </div>
+                            </div>
+
+                            <!-- Add Word Form -->
+                            <div class="p-6 rounded-3xl border space-y-4" style="background-color: var(--bg-main); border-color: var(--border-color);">
+                                <h3 class="font-bold text-xs flex items-center gap-2 text-blue-600">
+                                    <i class="fa-solid fa-plus-circle"></i>
+                                    <span>افزودن کلمه یا اصطلاح جدید به لایتنر</span>
+                                </h3>
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                    <input type="text" id="lang-word-input" placeholder="کلمه اصلی (مثال: Resilient / Harika)" class="px-4 py-3 rounded-2xl border text-xs bg-white dark:bg-slate-900 outline-none text-slate-900 dark:text-white font-medium" style="border-color: var(--border-color);">
+                                    <input type="text" id="lang-meaning-input" placeholder="معنی فارسی (مقاوم / عالی)" class="px-4 py-3 rounded-2xl border text-xs bg-white dark:bg-slate-900 outline-none text-slate-900 dark:text-white font-medium" style="border-color: var(--border-color);">
+                                    <input type="text" id="lang-example-input" placeholder="مثال کاربردی (اختیاری)" class="px-4 py-3 rounded-2xl border text-xs bg-white dark:bg-slate-900 outline-none text-slate-900 dark:text-white font-medium" style="border-color: var(--border-color);">
+                                </div>
+                                <div class="flex justify-end">
+                                    <button onclick="addAdvancedLangWord()" class="px-6 py-3 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow transition flex items-center gap-2">
+                                        <i class="fa-solid fa-check"></i>
+                                        <span>ثبت در جعبه لایتنر</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Words List & Grammar Notes -->
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                <div class="lg:col-span-2 p-6 rounded-3xl border space-y-4" style="background-color: var(--bg-main); border-color: var(--border-color);">
+                                    <div class="flex items-center justify-between border-b pb-3" style="border-color: var(--border-color);">
+                                        <div class="flex items-center gap-2 text-xs font-bold">
+                                            <i class="fa-solid fa-list-check text-blue-600"></i>
+                                            <span id="lang-list-title">گنجینه لغات فعال</span>
+                                        </div>
+                                        <span id="lang-total-badge" class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-600">۰ کلمه</span>
+                                    </div>
+                                    <div id="advanced-lang-words-list" class="space-y-3 max-h-[380px] overflow-y-auto"></div>
+                                </div>
+
+                                <div class="p-6 rounded-3xl border space-y-4" style="background-color: var(--bg-main); border-color: var(--border-color);">
+                                    <div class="flex items-center gap-2 text-xs font-bold text-amber-600 border-b pb-3" style="border-color: var(--border-color);">
+                                        <i class="fa-solid fa-book-bookmark"></i>
+                                        <span>نکات گرامری و اصطلاحات</span>
+                                    </div>
+                                    <textarea id="lang-grammar-textarea" rows="8" oninput="saveGrammarNotes()" placeholder="نکات مهم گرامری، افعال بی‌قاعده یا پسوندهای ترکی..." class="w-full p-4 rounded-2xl border text-xs bg-white dark:bg-slate-900 text-slate-900 dark:text-white outline-none resize-none font-medium leading-relaxed" style="border-color: var(--border-color);"></textarea>
+                                    <div class="p-3 rounded-xl bg-amber-500/10 text-amber-700 dark:text-amber-400 text-[11px] font-semibold">
+                                        💡 نکته: پیوستگی در مرور ۵ کلمه در روز، معجزه می‌کند!
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BOOKS TAB -->
+                    <div id="tab-books" class="tab-content space-y-6">
+                        <div class="dynamic-card p-6 md:p-8 rounded-3xl border shadow-sm space-y-6">
+                            <div class="flex flex-col md:flex-row items-center justify-between gap-4 border-b pb-6" style="border-color: var(--border-color);">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-600 flex items-center justify-center text-xl font-bold shadow">
+                                        <i class="fa-solid fa-book-open-reader"></i>
+                                    </div>
+                                    <div>
+                                        <h2 class="text-xl font-extrabold">کتابخانه و باشگاه مطالعه تخصصی</h2>
+                                        <p class="text-xs opacity-70">مدیریت کتاب‌های در حال مطالعه، آرشیو خوانده‌شده‌ها و یادداشت جملات برگزیده.</p>
+                                    </div>
+                                </div>
+                                <button onclick="openNewBookModal()" class="px-6 py-3 rounded-2xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-lg transition flex items-center gap-2">
+                                    <i class="fa-solid fa-plus text-sm"></i>
+                                    <span>افزودن کتاب جدید</span>
+                                </button>
+                            </div>
+
+                            <!-- Books Stats Grid -->
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                                <div class="p-5 rounded-3xl border shadow-sm flex items-center justify-between" style="background-color: var(--bg-main); border-color: var(--border-color);">
+                                    <div>
+                                        <span class="text-xs opacity-70 font-bold">کتاب‌های خوانده‌شده</span>
+                                        <div class="text-2xl font-black mt-2 text-emerald-600" id="book-stat-read">۰</div>
+                                    </div>
+                                    <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center text-lg font-bold">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                    </div>
+                                </div>
+                                <div class="p-5 rounded-3xl border shadow-sm flex items-center justify-between" style="background-color: var(--bg-main); border-color: var(--border-color);">
+                                    <div>
+                                        <span class="text-xs opacity-70 font-bold">در حال مطالعه</span>
+                                        <div class="text-2xl font-black mt-2 text-amber-600" id="book-stat-reading">۰</div>
+                                    </div>
+                                    <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-600 flex items-center justify-center text-lg font-bold">
+                                        <i class="fa-solid fa-book-bookmark"></i>
+                                    </div>
+                                </div>
+                                <div class="p-5 rounded-3xl border shadow-sm flex items-center justify-between" style="background-color: var(--bg-main); border-color: var(--border-color);">
+                                    <div>
+                                        <span class="text-xs opacity-70 font-bold">مجموع صفحات خوانده‌شده</span>
+                                        <div class="text-2xl font-black mt-2 text-blue-600" id="book-stat-pages">۰</div>
+                                    </div>
+                                    <div class="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-600 flex items-center justify-center text-lg font-bold">
+                                        <i class="fa-solid fa-file-lines"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Books Grid -->
+                            <div id="books-grid-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                        </div>
+                    </div>
+
+                    <!-- FINANCE TAB -->
+                    <div id="tab-finance" class="tab-content space-y-6">
+                        <div class="dynamic-card p-6 rounded-3xl border shadow-sm space-y-4">
+                            <h2 class="text-xl font-bold">مدیریت مالی و پس‌انداز طلا، نقره و مس</h2>
+                            <p class="text-xs opacity-70">ثبت پس‌اندازهای خرد (سوت طلا) و فلزات گرانبها متناسب با بودجه شما.</p>
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-2">
+                                <div class="p-4 rounded-2xl border" style="background-color: var(--bg-main);">
+                                    <span class="text-xs opacity-70">پس‌انداز طلا (سوت/گرم)</span>
+                                    <div class="text-xl font-bold mt-1" id="fin-gold-total">۰ تومان</div>
+                                </div>
+                                <div class="p-4 rounded-2xl border" style="background-color: var(--bg-main);">
+                                    <span class="text-xs opacity-70">پس‌انداز نقره</span>
+                                    <div class="text-xl font-bold mt-1" id="fin-silver-total">۰ تومان</div>
+                                </div>
+                                <div class="p-4 rounded-2xl border" style="background-color: var(--bg-main);">
+                                    <span class="text-xs opacity-70">پس‌انداز مس</span>
+                                    <div class="text-xl font-bold mt-1" id="fin-copper-total">۰ تومان</div>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <select id="fin-type" class="px-4 py-2.5 rounded-xl border text-xs bg-transparent">
+                                    <option value="طلای خرد (سوت)">طلای خرد (سوت)</option>
+                                    <option value="طلای کامل (گرم)">طلای کامل (گرم)</option>
+                                    <option value="نقره">نقره</option>
+                                    <option value="مس">مس</option>
+                                </select>
+                                <input type="number" id="fin-amount" placeholder="مقدار (مثلا ۵۰ سوت یا ۱ گرم)" class="px-4 py-2.5 rounded-xl border text-xs bg-transparent flex-1">
+                                <input type="number" id="fin-price" placeholder="قیمت خرید (تومان)" class="px-4 py-2.5 rounded-xl border text-xs bg-transparent flex-1">
+                                <button onclick="addFinanceItem()" class="px-5 py-2.5 rounded-xl bg-emerald-600 text-white text-xs font-medium">افزودن دارایی</button>
+                            </div>
+                            <div id="finance-list" class="space-y-2"></div>
+                        </div>
+                    </div>
+
+                    <!-- HABITS TAB -->
+                    <div id="tab-habits" class="tab-content space-y-6">
+                        <div class="dynamic-card p-6 rounded-3xl border shadow-sm space-y-4">
+                            <h2 class="text-xl font-bold">ردیاب عادات و خواب</h2>
+                            <p class="text-xs opacity-70">ثبت کیفیت خواب، میزان مصرف آب و عادات روزانه.</p>
+                            <div class="flex gap-2">
+                                <input type="text" id="new-habit-input" placeholder="عادتی که می‌خواهید ردیابی کنید..." class="flex-1 px-4 py-3 rounded-2xl border text-sm bg-transparent">
+                                <button onclick="addHabitItem()" class="px-6 py-3 rounded-2xl bg-teal-600 text-white font-medium text-sm">افزودن عادت</button>
+                            </div>
+                            <div id="habits-list" class="space-y-2"></div>
+                        </div>
+                    </div>
+
+                    <!-- VISION BOARD -->
+                    <div id="tab-vision" class="tab-content space-y-6">
+                        <div class="dynamic-card p-6 rounded-3xl border shadow-sm space-y-4">
+                            <h2 class="text-xl font-bold">جعبه اهداف و آرزوها (Vision Board)</h2>
+                            <p class="text-xs opacity-70">ثبت اهداف بزرگ سالانه، آرزوها و تصاویر ذهنی.</p>
+                            <div class="flex gap-2">
+                                <input type="text" id="new-vision-input" placeholder="هدف یا آرزوی بزرگ سالانه..." class="flex-1 px-4 py-3 rounded-2xl border text-sm bg-transparent">
+                                <button onclick="addVisionItem()" class="px-6 py-3 rounded-2xl bg-amber-500 text-white font-medium text-sm">ثبت هدف</button>
+                            </div>
+                            <div id="vision-list" class="space-y-2"></div>
+                        </div>
+                    </div>
+
+                    <!-- BUSINESS & IDEAS -->
+                    <div id="tab-business" class="tab-content space-y-6">
+                        <div class="dynamic-card p-6 rounded-3xl border shadow-sm space-y-4">
+                            <h2 class="text-xl font-bold">ایده‌ها و استارتاپ‌ها</h2>
+                            <p class="text-xs opacity-70">ثبت ایده‌های کسب‌وکار و مدل‌های درآمدی.</p>
+                            <div class="flex gap-2">
+                                <input type="text" id="new-biz-input" placeholder="عنوان ایده استارتاپی..." class="flex-1 px-4 py-3 rounded-2xl border text-sm bg-transparent">
+                                <button onclick="addBizItem()" class="px-6 py-3 rounded-2xl bg-emerald-600 text-white font-medium text-sm">ثبت ایده</button>
+                            </div>
+                            <div id="business-list" class="space-y-2"></div>
+                        </div>
+                    </div>
+
+                    <!-- DIET & CALORIE -->
+                    <div id="tab-diet" class="tab-content space-y-6">
+                        <div class="dynamic-card p-6 rounded-3xl border shadow-sm space-y-4">
+                            <h2 class="text-xl font-bold">رژیم و کالری‌شمار</h2>
+                            <p class="text-xs opacity-70">پیگیری کالری دریافتی و وعده‌های غذایی.</p>
+                            <div class="flex gap-2">
+                                <input type="text" id="new-diet-input" placeholder="نام غذا و میزان کالری..." class="flex-1 px-4 py-3 rounded-2xl border text-sm bg-transparent">
+                                <button onclick="addDietItem()" class="px-6 py-3 rounded-2xl bg-orange-500 text-white font-medium text-sm">ثبت وعده</button>
+                            </div>
+                            <div id="diet-list" class="space-y-2"></div>
+                        </div>
+                    </div>
+
+                    <!-- POMODORO TIMER -->
+                    <div id="tab-pomodoro" class="tab-content space-y-6">
+                        <div class="dynamic-card p-6 rounded-3xl border shadow-sm text-center py-10 space-y-6">
+                            <h2 class="text-2xl font-bold">تایمر تمرکز پومودورو</h2>
+                            <p class="text-xs opacity-70">زمان‌سنج مطالعه و کار عمیق با قابلیت تنظیم دلخواه.</p>
+                            <div class="flex justify-center items-center gap-2">
+                                <input type="number" id="pomodoro-custom-min" value="25" min="1" max="120" class="w-20 px-3 py-2 rounded-xl border text-center text-lg font-bold bg-transparent">
+                                <span class="text-sm opacity-70">دقیقه</span>
+                            </div>
+                            <div class="text-6xl font-black tracking-widest text-blue-600 my-6" id="pomodoro-display">25:00</div>
+                            <div class="flex justify-center gap-3">
+                                <button onclick="startPomodoro()" class="px-6 py-3 rounded-2xl bg-blue-600 text-white font-medium text-sm">شروع تمرکز</button>
+                                <button onclick="pausePomodoro()" class="px-6 py-3 rounded-2xl border font-medium text-sm">توقف</button>
+                                <button onclick="resetPomodoro()" class="px-6 py-3 rounded-2xl border font-medium text-sm">بازنشانی</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- USERS ADMIN PANEL -->
+                    <div id="tab-users" class="tab-content space-y-6">
+                        <div class="dynamic-card p-6 rounded-3xl border shadow-sm space-y-4">
+                            <h2 class="text-xl font-bold">مدیریت کاربران (اختصاصی مالک)</h2>
+                            <p class="text-xs opacity-70">فقط با حساب مدیریتی قابل مشاهده است.</p>
+                            <div id="users-admin-list" class="space-y-3">
+                                <div class="p-3 rounded-xl border flex items-center justify-between text-xs" style="background-color: var(--bg-main);">
+                                    <span>مالک اصلی: amirhoseinjahdi23@gmail.com</span>
+                                    <span class="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-600 font-bold">مدیر ارشد</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- NOTES TAB -->
+                    <div id="tab-notes" class="tab-content space-y-6">
+                        <div class="dynamic-card p-6 rounded-3xl border shadow-sm space-y-4">
+                            <h2 class="text-xl font-bold">یادداشت‌های آزاد</h2>
+                            <p class="text-xs opacity-70">یادداشت‌برداری سریع و امن ابری.</p>
+                            <div class="flex gap-2">
+                                <input type="text" id="new-note-input" placeholder="عنوان یادداشت..." class="flex-1 px-4 py-3 rounded-2xl border text-sm bg-transparent">
+                                <button onclick="addNoteItem()" class="px-6 py-3 rounded-2xl bg-violet-600 text-white font-medium text-sm">ثبت یادداشت</button>
+                            </div>
+                            <div id="notes-list" class="space-y-2"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </main>
+        <!-- BOOK ADD/EDIT MODAL -->
+        <div id="book-modal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
+            <div class="dynamic-card w-full max-w-md p-6 md:p-8 rounded-3xl border shadow-2xl space-y-5" style="background-color: #ffffff !important; border-color: #e2e8f0 !important; color: #0f172a !important;">
+                <div class="flex items-center justify-between border-b pb-4" style="border-color: #e2e8f0 !important;">
+                    <div class="flex items-center gap-2 font-bold text-base text-amber-600">
+                        <i class="fa-solid fa-book"></i>
+                        <span>افزودن کتاب جدید به کتابخانه</span>
+                    </div>
+                    <button onclick="closeBookModal()" class="p-2 opacity-70 hover:opacity-100 text-slate-800"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+                <div class="space-y-4">
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-700">نام کتاب:</label>
+                        <input type="text" id="modal-book-title" placeholder="مثال: اثر مرکب - دارن هاردی" class="w-full px-4 py-3 rounded-2xl border text-xs bg-slate-50 text-slate-900 outline-none font-medium" style="border-color: #cbd5e1 !important;">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-700">نویسنده:</label>
+                        <input type="text" id="modal-book-author" placeholder="نام نویسنده..." class="w-full px-4 py-3 rounded-2xl border text-xs bg-slate-50 text-slate-900 outline-none font-medium" style="border-color: #cbd5e1 !important;">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-700">وضعیت مطالعه:</label>
+                        <select id="modal-book-status" class="w-full px-4 py-3 rounded-2xl border text-xs bg-slate-50 text-slate-900 outline-none font-medium cursor-pointer" style="border-color: #cbd5e1 !important;">
+                            <option value="در حال مطالعه">در حال مطالعه 📖</option>
+                            <option value="خوانده شده">خوانده شده ✅</option>
+                            <option value="لیست انتظار">لیست انتظار ⏳</option>
+                        </select>
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-700">درصد پیشرفت (۰ تا ۱۰۰):</label>
+                        <input type="number" id="modal-book-progress" min="0" max="100" value="0" class="w-full px-4 py-3 rounded-2xl border text-xs bg-slate-50 text-slate-900 outline-none font-medium" style="border-color: #cbd5e1 !important;">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-slate-700">جملات برگزیده یا یادداشت:</label>
+                        <textarea id="modal-book-notes" rows="2" placeholder="نکات مهم و جملات به‌یادماندنی..." class="w-full px-4 py-3 rounded-2xl border text-xs bg-slate-50 text-slate-900 outline-none font-medium resize-y" style="border-color: #cbd5e1 !important;"></textarea>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-3 pt-2">
+                    <button onclick="closeBookModal()" class="px-5 py-2.5 rounded-2xl border text-xs font-medium text-slate-700 bg-slate-100">انصراف</button>
+                    <button onclick="saveBookModal()" class="px-6 py-2.5 rounded-2xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow transition">ثبت کتاب</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- AUTH MODAL -->
+        <div id="auth-modal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
+            <div class="dynamic-card w-full max-w-sm p-6 rounded-3xl border shadow-2xl space-y-4">
+                <div class="flex justify-between items-center border-b pb-3">
+                    <h3 class="font-bold text-sm">حساب کاربری امن JARVIS</h3>
+                    <button onclick="closeAuthModal()"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="space-y-3">
+                    <input type="email" id="auth-email" placeholder="ایمیل شما..." class="w-full p-3 rounded-xl border text-xs bg-transparent">
+                    <input type="password" id="auth-password" placeholder="رمز عبور..." class="w-full p-3 rounded-xl border text-xs bg-transparent">
+                    <button onclick="handleLogin()" class="w-full py-3 rounded-xl bg-blue-600 text-white font-bold text-xs">ورود یا ثبت‌نام</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TOAST NOTIFICATION -->
+        <div id="toast" class="fixed bottom-6 left-6 z-50 bg-slate-900 text-white px-5 py-3 rounded-2xl text-xs font-bold shadow-2xl opacity-0 pointer-events-none transition-all"></div>
+
+        <script>
+            // تعریف تابع switchTab در بالاترین سطح سراسری (Global Scope) برای جلوگیری از خطای ReferenceError
+            function switchTab(tabId) {
+                currentTab = tabId;
+                const tabs = document.querySelectorAll('.tab-content');
+                tabs.forEach(t => t.classList.remove('active'));
+                
+                const targetTab = document.getElementById(`tab-${tabId}`);
+                if (targetTab) {
+                    targetTab.classList.add('active');
+                }
+
+                // به‌روزرسانی استایل دکمه‌های منو
+                const buttons = document.querySelectorAll('.nav-item-btn');
+                buttons.forEach(btn => btn.classList.remove('active-nav'));
+                const activeBtn = document.getElementById(`btn-${tabId}`);
+                if (activeBtn) {
+                    activeBtn.classList.add('active-nav');
+                }
+            }
+
+            let currentUser = {
+                email: 'amirhoseinjahdi23@gmail.com',
+                isOwner: true
+            };
+            let isDarkMode = false;
+            let currentTab = 'home';
+            let currentWeekOffset = 0;
+            let currentSelectedYtIdx = null;
+
+            let appData = {
+                daily: [
+                    { text: 'بیداری با لبخند و مدیتیشن صبحگاهی', done: true, icon: 'sun' },
+                    { text: 'نوشیدن نوشیدنی گرم و مرور اهداف روزانه', done: true, icon: 'mug-hot' }
+                ],
+                books: [
+                    { title: 'انسان در جستجوی معنا', author: 'ویکتور فرانکل', status: 'خوانده شده', progress: 100, notes: 'کتابی فوق‌العاده درباره یافتن معنا در سخت‌ترین شرایط زندگی.' },
+                    { title: 'اثر مرکب', author: 'دارن هاردی', status: 'در حال مطالعه', progress: 45, notes: 'انتخاب‌های کوچک هوشمندانه + پیوستگی + زمان = تفاوت‌های اساسی.' }
+                ],
+                dailyArchive: [
+                    {
+                        date: '۱۰ آبان ۱۴۰۵',
+                        gratitude: 'دیروز روز بسیار پرباری بود و پروژه را جلو بردم.',
+                        tasks: [
+                            { text: 'جلسه تیم فنی', done: true },
+                            { text: 'مطالعه زبان', done: true }
+                        ]
+                    }
+                ],
+                monthlyGoals: [
+                    { text: 'هدف اول ماه', done: true },
+                    { text: 'هدف دوم ماه', done: true }
+                ],
+                monthlyEvents: {
+                    "آبان-۱۰": "جلسه مهم با سرمایه‌گذار"
+                },
+                ytPublishDates: {
+                    "5": "ویدیو معرفی ابزار",
+                    "12": "آموزش برنامه‌نویسی",
+                    "20": "ولاگ روزانه"
+                },
+                instagram: [{ text: 'ایده ویدیو معرفی ابزار JARVIS' }],
+                youtube: [
+                    { 
+                        title: 'چگونه برنامه‌نویسی را از صفر شروع کنیم و حرفه‌ای شویم؟', 
+                        tag: '۵ تگ سئو شده', 
+                        status: 'در حال تولید', 
+                        notes: 'بررسی سرفصل‌های آموزشی، ضبط اسکرین‌کست و تدوین با پریمیر.', 
+                        done: false 
+                    },
+                    { 
+                        title: 'معجزه روتین صبحگاهی برای موفقیت روزانه', 
+                        tag: '۴ تگ کلیدی', 
+                        status: 'منتشر شده', 
+                        notes: 'ویدیو با موفقیت بارگذاری شد و بازخورد عالی داشت.', 
+                        done: true 
+                    }
+                ],
+                languages: {
+                    currentLang: 'EN',
+                    filterBox: null,
+                    EN: [
+                        { id: 1, word: 'Resilient', meaning: 'مقاوم، تاب‌آور', example: 'She is a resilient leader.', box: 1 },
+                        { id: 2, word: 'Empowerment', meaning: 'توانمندسازی', example: 'Education brings empowerment.', box: 2 }
+                    ],
+                    TR: [
+                        { id: 1, word: 'Harika', meaning: 'عالی، فوق‌العاده', example: 'Bu gün harika bir hava var.', box: 1 },
+                        { id: 2, word: 'Teşekkür ederim', meaning: 'تشکر می‌کنم', example: 'Yardımın için teşekkür ederim.', box: 3 }
+                    ],
+                    grammar: {
+                        EN: 'قواعد زمان حال ساده: Subject + Verb (s/es) + Object.\nبرای سوالی کردن از Do/Does استفاده می‌شود.',
+                        TR: 'قواعد هماهنگی صداها (Ünlü Uyumu):\nکلمات با صداهای نازک (e, i, ö, ü) با پسوندهای مشابه می‌آیند.'
+                    }
+                },
+                finance: [
+                    { type: 'طلای خرد (سوت)', amount: '۵۰ سوت', price: '2500000' }
+                ],
+                habits: [{ text: '۸ ساعت خواب منظم شبانه' }],
+                vision: [{ text: 'تکمیل استارتاپ شخصی و دستیابی به استقلال مالی' }],
+                business: [{ text: 'پلتفرم هوشمند مدیریت زمان و کار' }],
+                diet: [{ text: 'صبحانه جو دوسر و عسل - ۳۵۰ کالری' }],
+                notes: [{ text: 'یادداشت مهم پروژه: تمرکز روی سرعت و خوانایی' }]
+            };
+
+            window.onload = function() {
+                updateUIState();
+                renderAnnualCalendar();
+                renderAllLists();
+                updateHomeStats();
+                renderMonthlyView();
+                renderYtPublishCalendar();
+                renderBooksList();
+                if (appData.youtube.length > 0) {
+                    selectYtVideo(0);
+                }
+            };
+
+            function renderAllLists() {
+                renderDailyTasks();
+                renderDailyArchive();
+                renderWeeklyDays();
+                renderMonthlyView();
+                renderYtPublishCalendar();
+                renderBooksList();
+                renderList('instagram', 'instagram-list', (item, idx) => `
+                    <div class="flex items-center justify-between p-3.5 rounded-2xl border text-xs" style="background-color: var(--bg-main);">
+                        <span>ایده: ${item.text}</span>
+                        <button onclick="removeItem('instagram', ${idx})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `);
+                renderYoutubeList();
+                renderAdvancedLanguages();
+                renderFinanceList();
+                renderList('habits', 'habits-list', (item, idx) => `
+                    <div class="flex items-center justify-between p-3 rounded-xl border text-sm" style="background-color: var(--bg-main);">
+                        <span>عادت: ${item.text}</span>
+                        <button onclick="removeItem('habits', ${idx})" class="text-rose-500 text-xs"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `);
+                renderList('vision', 'vision-list', (item, idx) => `
+                    <div class="flex items-center justify-between p-3 rounded-xl border text-sm" style="background-color: var(--bg-main);">
+                        <span>هدف: ${item.text}</span>
+                        <button onclick="removeItem('vision', ${idx})" class="text-rose-500 text-xs"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `);
+                renderList('business', 'business-list', (item, idx) => `
+                    <div class="flex items-center justify-between p-3 rounded-xl border text-sm" style="background-color: var(--bg-main);">
+                        <span>استارتاپ: ${item.text}</span>
+                        <button onclick="removeItem('business', ${idx})" class="text-rose-500 text-xs"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `);
+                renderList('diet', 'diet-list', (item, idx) => `
+                    <div class="flex items-center justify-between p-3 rounded-xl border text-sm" style="background-color: var(--bg-main);">
+                        <span>وعده غذایی: ${item.text}</span>
+                        <button onclick="removeItem('diet', ${idx})" class="text-rose-500 text-xs"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `);
+                renderList('notes', 'notes-list', (item, idx) => `
+                    <div class="flex items-center justify-between p-3 rounded-xl border text-sm" style="background-color: var(--bg-main);">
+                        <span>یادداشت: ${item.text}</span>
+                        <button onclick="removeItem('notes', ${idx})" class="text-rose-500 text-xs"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `);
+            }
+
+            function selectYtVideo(idx) {
+                currentSelectedYtIdx = idx;
+                const v = appData.youtube[idx];
+                const container = document.getElementById('yt-details-container');
+                if (!container || !v) return;
+
+                container.innerHTML = `
+                    <div class="space-y-6">
+                        <div class="flex items-center justify-between border-b pb-4" style="border-color: var(--border-color);">
+                            <div>
+                                <span class="px-3 py-1 rounded-full text-[10px] font-bold ${v.status === 'منتشر شده' ? 'bg-emerald-500/10 text-emerald-600' : 'bg-amber-500/10 text-amber-600'}">${v.status}</span>
+                                <h3 class="font-extrabold text-lg mt-2">${v.title}</h3>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="toggleYtStatus(${idx})" class="px-4 py-2 rounded-xl bg-blue-600 text-white text-xs font-bold shadow hover:bg-blue-700 transition">تغییر وضعیت</button>
+                                <button onclick="deleteYtVideo(${idx})" class="px-3 py-2 rounded-xl bg-rose-500/10 text-rose-600 text-xs font-bold"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="p-4 rounded-2xl border space-y-2" style="background-color: var(--bg-main);">
+                                <span class="text-xs font-bold text-red-600 flex items-center gap-1.5"><i class="fa-solid fa-shield-halved"></i> وضعیت سئو و تگ‌ها</span>
+                                <p class="text-xs opacity-80">${v.tag || 'بدون تگ'}</p>
+                            </div>
+                            <div class="p-4 rounded-2xl border space-y-2" style="background-color: var(--bg-main);">
+                                <span class="text-xs font-bold text-amber-600 flex items-center gap-1.5"><i class="fa-solid fa-note-sticky"></i> یادداشت‌ها و اسکریپت</span>
+                                <p class="text-xs opacity-80">${v.notes || 'بدون یادداشت'}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            function toggleYtStatus(idx) {
+                const v = appData.youtube[idx];
+                if (v.status === 'منتشر شده') {
+                    v.status = 'در حال تولید';
+                } else {
+                    v.status = 'منتشر شده';
+                }
+                renderYoutubeList();
+                selectYtVideo(idx);
+                showToast('وضعیت ویدیو به‌روز شد.');
+            }
+
+            function deleteYtVideo(idx) {
+                appData.youtube.splice(idx, 1);
+                renderYoutubeList();
+                document.getElementById('yt-details-container').innerHTML = `
+                    <div class="space-y-6 text-center py-12">
+                        <div class="w-20 h-20 rounded-3xl bg-red-500/10 text-red-600 flex items-center justify-center text-3xl mx-auto shadow-inner">
+                            <i class="fa-brands fa-youtube"></i>
+                        </div>
+                        <div class="space-y-2">
+                            <h3 class="text-lg font-bold">ویدیویی انتخاب نشده است</h3>
+                            <p class="text-xs opacity-70 max-w-sm mx-auto leading-relaxed">از لیست سمت راست یک ویدیو انتخاب کنید.</p>
+                        </div>
+                    </div>
+                `;
+                showToast('ویدیو حذف شد.');
+            }
+
+            function renderYoutubeList() {
+                const listContainer = document.getElementById('youtube-list');
+                if (!listContainer) return;
+                const vids = appData.youtube || [];
+                
+                const statPub = document.getElementById('yt-stat-published');
+                const statProd = document.getElementById('yt-stat-producing');
+                const statTotal = document.getElementById('yt-stat-total');
+                const listBadge = document.getElementById('yt-list-count-badge');
+
+                if (statPub) statPub.innerText = vids.filter(v => v.status === 'منتشر شده').length;
+                if (statProd) statProd.innerText = vids.filter(v => v.status !== 'منتشر شده').length;
+                if (statTotal) statTotal.innerText = vids.length;
+                if (listBadge) listBadge.innerText = `${vids.length} مورد`;
+
+                if (vids.length === 0) {
+                    listContainer.innerHTML = '<p class="text-xs opacity-50 py-4 text-center">ویدیویی ثبت نشده است.</p>';
+                    return;
+                }
+
+                listContainer.innerHTML = vids.map((v, idx) => `
+                    <div onclick="selectYtVideo(${idx})" class="p-3.5 rounded-2xl border cursor-pointer transition hover:scale-[1.01] flex items-center justify-between" style="background-color: var(--bg-main);">
+                        <div class="space-y-1 truncate">
+                            <h4 class="font-bold text-xs truncate">${v.title}</h4>
+                            <span class="text-[10px] opacity-70">${v.tag || ''}</span>
+                        </div>
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold shrink-0 ${v.status === 'منتشر شده' ? 'bg-emerald-500/10 text-emerald-600' : 'bg-amber-500/10 text-amber-600'}">${v.status}</span>
+                    </div>
+                `).join('');
+            }
+
+            function renderYtPublishCalendar() {
+                const grid = document.getElementById('yt-publish-calendar-grid');
+                if (!grid) return;
+                let html = '';
+                for (let i = 1; i <= 30; i++) {
+                    const hasVid = appData.ytPublishDates[i];
+                    html += `
+                        <div onclick="promptYtPublishDay(${i})" class="p-3 rounded-2xl border text-center cursor-pointer transition hover:bg-red-500/5 min-h-[75px] flex flex-col justify-between" style="background-color: ${hasVid ? 'rgba(239, 68, 68, 0.08)' : 'var(--bg-main)'}; border-color: ${hasVid ? '#ef4444' : 'var(--border-color)'};">
+                            <span class="text-xs font-bold">${i} آبان</span>
+                            ${hasVid ? '<span class="w-6 h-6 rounded-full bg-red-600 text-white text-[10px] flex items-center justify-center mx-auto shadow"><i class="fa-solid fa-check"></i></span>' : '<span class="text-[10px] opacity-40">+ ایده</span>'}
+                        </div>
+                    `;
+                }
+                grid.innerHTML = html;
+            }
+
+            function promptYtPublishDay(day) {
+                const currentVal = appData.ytPublishDates[day] || '';
+                const newVal = prompt(`ثبت یا ویرایش ویدیوی روز ${day} آبان:`, currentVal);
+                if (newVal !== null) {
+                    if (newVal.trim() === '') {
+                        delete appData.ytPublishDates[day];
+                    } else {
+                        appData.ytPublishDates[day] = newVal.trim();
+                    }
+                    renderYtPublishCalendar();
+                    showToast('تقویم انتشار به‌روز شد.');
+                }
+            }
+
+            function openNewYtModal() {
+                const title = prompt('عنوان ویدیوی جدید یوتیوب:');
+                if (title && title.trim()) {
+                    appData.youtube.push({
+                        title: title.trim(),
+                        tag: 'تگ عمومی',
+                        status: 'در حال تولید',
+                        notes: 'اسکریپت اولیه...',
+                        done: false
+                    });
+                    renderYoutubeList();
+                    selectYtVideo(appData.youtube.length - 1);
+                    showToast('ویدیو جدید افزوده شد.');
+                }
+            }
+
+            function setLangLanguage(lang) {
+                appData.languages.currentLang = lang;
+                const btnEn = document.getElementById('lang-tab-en');
+                const btnTr = document.getElementById('lang-tab-tr');
+                if (lang === 'EN') {
+                    btnEn.className = "px-5 py-2.5 rounded-2xl text-xs font-bold transition bg-blue-600 text-white shadow";
+                    btnTr.className = "px-5 py-2.5 rounded-2xl text-xs font-bold transition bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300";
+                } else {
+                    btnTr.className = "px-5 py-2.5 rounded-2xl text-xs font-bold transition bg-blue-600 text-white shadow";
+                    btnEn.className = "px-5 py-2.5 rounded-2xl text-xs font-bold transition bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300";
+                }
+                renderAdvancedLanguages();
+            }
+
+            function renderAdvancedLanguages() {
+                const lang = appData.languages.currentLang;
+                const words = appData.languages[lang] || [];
+                const listContainer = document.getElementById('advanced-lang-words-list');
+                const totalBadge = document.getElementById('lang-total-badge');
+                const grammarArea = document.getElementById('lang-grammar-textarea');
+
+                if (totalBadge) totalBadge.innerText = `${words.length} کلمه`;
+                if (grammarArea) grammarArea.value = appData.languages.grammar[lang] || '';
+
+                for (let i = 1; i <= 5; i++) {
+                    const count = words.filter(w => (w.box || 1) === i).length;
+                    const bElem = document.getElementById(`box-count-${i}`);
+                    if (bElem) bElem.innerText = count;
+                }
+
+                if (!listContainer) return;
+                if (words.length === 0) {
+                    listContainer.innerHTML = '<p class="text-xs opacity-50 py-4 text-center">کلمه‌ای در این بخش ثبت نشده است.</p>';
+                    return;
+                }
+
+                listContainer.innerHTML = words.map((w, idx) => `
+                    <div class="p-4 rounded-2xl border flex items-center justify-between text-xs" style="background-color: var(--bg-main);">
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2">
+                                <span class="font-extrabold text-sm">${w.word}</span>
+                                <span class="opacity-70">(${w.meaning})</span>
+                            </div>
+                            <p class="text-[11px] opacity-60 italic">${w.example || ''}</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-600 font-bold text-[10px]">خانه ${w.box || 1}</span>
+                            <button onclick="removeLangWord(${idx})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            function addAdvancedLangWord() {
+                const lang = appData.languages.currentLang;
+                const word = document.getElementById('lang-word-input').value.trim();
+                const meaning = document.getElementById('lang-meaning-input').value.trim();
+                const example = document.getElementById('lang-example-input').value.trim();
+
+                if (!word || !meaning) {
+                    showToast('کلمه و معنی فارسی الزامی است.');
+                    return;
+                }
+
+                appData.languages[lang].push({ word, meaning, example, box: 1 });
+                document.getElementById('lang-word-input').value = '';
+                document.getElementById('lang-meaning-input').value = '';
+                document.getElementById('lang-example-input').value = '';
+                renderAdvancedLanguages();
+                showToast('کلمه جدید به لایتنر افزوده شد.');
+            }
+
+            function removeLangWord(idx) {
+                const lang = appData.languages.currentLang;
+                appData.languages[lang].splice(idx, 1);
+                renderAdvancedLanguages();
+                showToast('کلمه حذف شد.');
+            }
+
+            function saveGrammarNotes() {
+                const lang = appData.languages.currentLang;
+                const val = document.getElementById('lang-grammar-textarea').value;
+                appData.languages.grammar[lang] = val;
+            }
+
+            function filterLeitnerBox(boxNum) {
+                showToast(`نمایش کلمات خانه ${boxNum}`);
+            }
+
+            function addFinanceItem() {
+                const type = document.getElementById('fin-type').value;
+                const amount = document.getElementById('fin-amount').value.trim();
+                const price = document.getElementById('fin-price').value.trim();
+                if (!amount) return;
+                appData.finance.push({ type, amount, price: price || '0' });
+                renderFinanceList();
+                showToast('دارایی جدید ثبت شد.');
+            }
+
+            function renderFinanceList() {
+                const list = document.getElementById('finance-list');
+                if (!list) return;
+                let totalGold = 0;
+                appData.finance.forEach(f => {
+                    totalGold += Number(f.price) || 0;
+                });
+                const totalElem = document.getElementById('fin-gold-total');
+                if (totalElem) totalElem.innerText = totalGold.toLocaleString() + ' تومان';
+
+                list.innerHTML = appData.finance.map((item, idx) => `
+                    <div class="p-3 rounded-xl border flex items-center justify-between text-xs" style="background-color: var(--bg-main);">
+                        <span>${item.type} - مقدار: ${item.amount} (${Number(item.price || 0).toLocaleString()} تومان)</span>
+                        <button onclick="removeFinance(${idx})" class="text-rose-500"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `).join('');
+            }
+
+            function removeFinance(idx) {
+                appData.finance.splice(idx, 1);
+                renderFinanceList();
+            }
+
+            let pomodoroInterval = null;
+            let pomodoroSeconds = 25 * 60;
+            function startPomodoro() {
+                if (pomodoroInterval) return;
+                const customMin = Number(document.getElementById('pomodoro-custom-min').value) || 25;
+                if (pomodoroSeconds === 25 * 60) pomodoroSeconds = customMin * 60;
+                
+                pomodoroInterval = setInterval(() => {
+                    if (pomodoroSeconds > 0) {
+                        pomodoroSeconds--;
+                        updatePomodoroDisplay();
+                    } else {
+                        clearInterval(pomodoroInterval);
+                        pomodoroInterval = null;
+                        showToast('زمان تمرکز به پایان رسید!');
+                    }
+                }, 1000);
+            }
+
+            function pausePomodoro() {
+                clearInterval(pomodoroInterval);
+                pomodoroInterval = null;
+            }
+
+            function resetPomodoro() {
+                clearInterval(pomodoroInterval);
+                pomodoroInterval = null;
+                const customMin = Number(document.getElementById('pomodoro-custom-min').value) || 25;
+                pomodoroSeconds = customMin * 60;
+                updatePomodoroDisplay();
+            }
+
+            function updatePomodoroDisplay() {
+                const m = Math.floor(pomodoroSeconds / 60);
+                const s = pomodoroSeconds % 60;
+                const display = document.getElementById('pomodoro-display');
+                if (display) {
+                    display.innerText = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+                }
+            }
+
+            function addInstaItem() {
+                const val = document.getElementById('new-insta-input').value.trim();
+                if (!val) return;
+                appData.instagram.push({ text: val });
+                document.getElementById('new-insta-input').value = '';
+                renderAllLists();
+            }
+
+            function addHabitItem() {
+                const val = document.getElementById('new-habit-input').value.trim();
+                if (!val) return;
+                appData.habits.push({ text: val });
+                document.getElementById('new-habit-input').value = '';
+                renderAllLists();
+            }
+
+            function addVisionItem() {
+                const val = document.getElementById('new-vision-input').value.trim();
+                if (!val) return;
+                appData.vision.push({ text: val });
+                document.getElementById('new-vision-input').value = '';
+                renderAllLists();
+            }
+
+            function addBizItem() {
+                const val = document.getElementById('new-biz-input').value.trim();
+                if (!val) return;
+                appData.business.push({ text: val });
+                document.getElementById('new-biz-input').value = '';
+                renderAllLists();
+            }
+
+            function addDietItem() {
+                const val = document.getElementById('new-diet-input').value.trim();
+                if (!val) return;
+                appData.diet.push({ text: val });
+                document.getElementById('new-diet-input').value = '';
+                renderAllLists();
+            }
+
+            function addNoteItem() {
+                const val = document.getElementById('new-note-input').value.trim();
+                if (!val) return;
+                appData.notes.push({ text: val });
+                document.getElementById('new-note-input').value = '';
+                renderAllLists();
+            }
+
+            function removeItem(key, idx) {
+                appData[key].splice(idx, 1);
+                renderAllLists();
+            }
+
+            function addDailyTask() {
+                const val = document.getElementById('new-task-input').value.trim();
+                if (!val) return;
+                appData.daily.push({ text: val, done: false });
+                document.getElementById('new-task-input').value = '';
+                renderDailyTasks();
+            }
+
+            function resetDailyTasks() {
+                appData.daily.forEach(t => t.done = false);
+                renderDailyTasks();
+            }
+
+            function saveCurrentDayToArchive() {
+                appData.dailyArchive.push({
+                    date: '۱۱ آبان ۱۴۰۵',
+                    gratitude: document.getElementById('daily-gratitude-text').value,
+                    tasks: [...appData.daily]
+                });
+                renderDailyArchive();
+                showToast('روز جاری در آرشیو ثبت شد.');
+            }
+
+            function changeWeek(offset) {
+                currentWeekOffset += offset;
+                const d = document.getElementById('weekly-title-display');
+                if (d) d.innerText = `دیدگاه هفتگی (هفته شماره ${Math.abs(currentWeekOffset) + 1})`;
+            }
+
+            function currentWeekNow() {
+                currentWeekOffset = 0;
+                const d = document.getElementById('weekly-title-display');
+                if (d) d.innerText = `دیدگاه هفتگی (هفته جاری)`;
+            }
+
+            function addMonthlyGoal() {
+                const val = document.getElementById('new-monthly-goal-input').value.trim();
+                if (!val) return;
+                appData.monthlyGoals.push({ text: val, done: false });
+                document.getElementById('new-monthly-goal-input').value = '';
+                renderMonthlyView();
+            }
+
+            function renderBooksList() {
+                const container = document.getElementById('books-grid-container');
+                if (!container) return;
+                const books = appData.books || [];
+
+                const statRead = document.getElementById('book-stat-read');
+                const statReading = document.getElementById('book-stat-reading');
+                const statPages = document.getElementById('book-stat-pages');
+
+                if (statRead) statRead.innerText = books.filter(b => b.status === 'خوانده شده').length;
+                if (statReading) statReading.innerText = books.filter(b => b.status === 'در حال مطالعه').length;
+                if (statPages) statPages.innerText = books.reduce((acc, b) => acc + (b.progress || 0) * 3, 0);
+
+                if (books.length === 0) {
+                    container.innerHTML = '<p class="text-xs opacity-50 py-8 text-center col-span-full">کتابی ثبت نشده است.</p>';
+                    return;
+                }
+
+                container.innerHTML = books.map((b, idx) => {
+                    let badgeClass = 'bg-amber-500/10 text-amber-600';
+                    if (b.status === 'خوانده شده') badgeClass = 'bg-emerald-500/10 text-emerald-600';
+                    else if (b.status === 'لیست انتظار') badgeClass = 'bg-blue-500/10 text-blue-600';
+
+                    return `
+                        <div class="p-6 rounded-3xl border shadow-sm space-y-4 flex flex-col justify-between" style="background-color: var(--bg-main); border-color: var(--border-color);">
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="px-3 py-1 rounded-full text-[10px] font-bold ${badgeClass}">${b.status}</span>
+                                    <button onclick="removeBook(${idx})" class="text-rose-400 hover:text-rose-600 text-xs"><i class="fa-solid fa-trash"></i></button>
+                                </div>
+                                <h3 class="font-extrabold text-base">${b.title}</h3>
+                                <p class="text-xs opacity-70">نویسنده: ${b.author || 'نامشخص'}</p>
+                            </div>
+                            <div class="space-y-3 pt-2 border-t" style="border-color: var(--border-color);">
+                                <div class="flex justify-between text-xs font-bold">
+                                    <span>پیشرفت مطالعه</span>
+                                    <span>درصد ${b.progress || 0}%</span>
+                                </div>
+                                <div class="w-full h-2.5 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+                                    <div class="h-full bg-amber-500 rounded-full transition-all duration-500" style="width: ${b.progress || 0}%"></div>
+                                </div>
+                                ${b.notes ? `<p class="text-[11px] opacity-75 italic bg-amber-500/5 p-3 rounded-2xl border border-amber-500/15">«${b.notes}»</p>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            function openNewBookModal() {
+                document.getElementById('modal-book-title').value = '';
+                document.getElementById('modal-book-author').value = '';
+                document.getElementById('modal-book-status').value = 'در حال مطالعه';
+                document.getElementById('modal-book-progress').value = '25';
+                document.getElementById('modal-book-notes').value = '';
+                document.getElementById('book-modal').classList.remove('hidden');
+            }
+
+            function closeBookModal() {
+                document.getElementById('book-modal').classList.add('hidden');
+            }
+
+            function saveBookModal() {
+                const title = document.getElementById('modal-book-title').value.trim();
+                const author = document.getElementById('modal-book-author').value.trim();
+                const status = document.getElementById('modal-book-status').value;
+                const progress = Number(document.getElementById('modal-book-progress').value) || 0;
+                const notes = document.getElementById('modal-book-notes').value.trim();
+
+                if (!title) {
+                    showToast('نام کتاب الزامی است.');
+                    return;
+                }
+
+                appData.books.push({ title, author, status, progress, notes });
+                closeBookModal();
+                renderBooksList();
+                showToast('کتاب جدید با موفقیت به کتابخانه افزوده شد.');
+            }
+
+            function removeBook(idx) {
+                appData.books.splice(idx, 1);
+                renderBooksList();
+                showToast('کتاب حذف شد.');
+            }
+
+            function toggleSidebar() {
+                const sidebar = document.getElementById('sidebar-container');
+                sidebar.classList.toggle('sidebar-collapsed');
+            }
+
+            function toggleDarkMode() {
+                isDarkMode = !isDarkMode;
+                document.body.classList.toggle('dark-mode', isDarkMode);
+                const icon = document.getElementById('theme-mode-icon');
+                if (icon) {
+                    icon.className = isDarkMode ? "fa-solid fa-sun text-sm text-amber-400" : "fa-solid fa-moon text-sm";
+                }
+            }
+
+            function openAuthModal() {
+                document.getElementById('auth-modal').classList.remove('hidden');
+            }
+
+            function closeAuthModal() {
+                document.getElementById('auth-modal').classList.add('hidden');
+            }
+
+            function handleLogin() {
+                const email = document.getElementById('auth-email').value.trim();
+                if (email) {
+                    currentUser.email = email;
+                    document.getElementById('user-email-display-top').innerText = email;
+                }
+                closeAuthModal();
+                showToast('حساب کاربری به‌روز شد.');
+            }
+
+            function showToast(msg) {
+                const t = document.getElementById('toast');
+                if (!t) return;
+                t.innerText = msg;
+                t.style.opacity = '1';
+                setTimeout(() => {
+                    t.style.opacity = '0';
+                }, 3000);
+            }
+
+            function updateUIState() {}
+            function renderAnnualCalendar() {
+                const container = document.getElementById('annual-calendar-container');
+                if (!container) return;
+                const months = ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'];
+                container.innerHTML = months.map(m => `
+                    <div class="p-4 rounded-2xl border space-y-2" style="background-color: var(--bg-main);">
+                        <h3 class="font-bold text-sm">${m} ۱۴۰۵</h3>
+                        <p class="text-[11px] opacity-70">برنامه‌ریزی ماهانه و رویدادهای مهم</p>
+                    </div>
+                `).join('');
+            }
+            function updateHomeStats() {}
+            function renderDailyTasks() {}
+            function renderDailyArchive() {}
+            function renderWeeklyDays() {}
+            function renderMonthlyView() {}
+            function renderYtPublishCalendar() {}
+            function renderYoutubeList() {}
+            function renderAdvancedLanguages() {}
+            function renderFinanceList() {}
+            function renderList(key, elemId, renderer) {}
+        </script>
+    </body>
+    </html>
